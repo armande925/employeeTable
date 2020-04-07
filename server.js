@@ -30,7 +30,6 @@ function executeSearch() {
         "Add Role",
         "Remove Employee",
         "Update Employee Role",
-        "Update Employee Manager",
         "Exit"]
 
     })
@@ -69,9 +68,9 @@ function executeSearch() {
           removeEmployee();
           break;
 
-        case "Update Employee Role":
-          updateEmployee();
-          break;
+          case "Update Employee Role":
+            updateEmployee();
+            break;
 
         case "Exit":
           connection.end();
@@ -156,26 +155,23 @@ function addEmployee() {
 
 function addDepartment() {
   inquirer
-    .prompt({
-      name: "department",
+    .prompt([{
+      name: "addDepartment",
       type: "input",
-      message: ["To ADD a department, enter new department name"]
-    })
+      message: "To ADD a department, enter new department name"
+    },])
 
-    .then(function (answer) {
-      console.log(answer)
-      // var str = answer.addDepartment;
-      var department = answer.department;
-      console.log(department);
-      var query = "INSERT INTO department (name) VALUES ?";
+    .then(function (res) {
+      console.log(res)
 
-      connection.query(query,  [department], function (err, res) {
-      console.log(res);
+      connection.query("INSERT INTO department (name) VALUE (?)", [res.addDepartment], function (err, res) {
+      if(err) throw err;
+      console.log("Successfully Added Department!");
+      executeSearch();
 
       });
-      executeSearch();
     })
-}
+};
 
 // function to add role to table for new employee or position
 
@@ -238,6 +234,7 @@ function removeEmployee() {
       var newId = Number(answer.removeEmployee);
       console.log(newId);
       connection.query(query, { id: newId }, function (err, res) {
+      executeSearch();
 
       });
     });
@@ -272,26 +269,5 @@ function updateEmployee() {
             executeSearch();
           });
         });
-    });
-}
-// function to update the manager for an employee
-
-function employeeManager() {
-  inquirer
-    .prompt({
-      name: "employeeManager",
-      type: "input",
-      message: "What employee would you like to update the manager for?",
-      //choices: need to figure out if we want to pull this by employee and then prompt for manager name
-    })
-    .then(function (answer) {
-      var query = "SELECT manager_id FROM employee WHERE ?";
-      connection.query(query, function (err, res) {
-        for (var i = 0; i < res.length; i++) {
-          console.log(res[i].employee);
-        }
-
-        executeSearch();
-      });
     });
 }
